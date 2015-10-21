@@ -25,6 +25,9 @@
 #include "TagBuilder.hxx"
 #include "util/ASCII.hxx"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 static void
 add_tag_duration(SongTime duration, void *ctx)
 {
@@ -39,17 +42,16 @@ add_tag_tag(TagType type, const char *value, void *ctx)
 	TagBuilder &tag = *(TagBuilder *)ctx;
 
 	if (type == TAG_TRACK || type == TAG_DISC) {
+		/* filter out this extra data and leading zeroes */
 		char *end;
-		int n = strtol(value, &end, 10);
+		unsigned n = strtoul(value, &end, 10);
 		if (value != end) {
 			char s[21];
-			if (snprintf(s, 21, "%d", n) >= 0) {
+			if (snprintf(s, 21, "%u", n) >= 0)
 				tag.AddItem(type, s);
-			}
 		}
-	} else  {
+	} else
 		tag.AddItem(type, value);
-	}
 }
 
 const struct tag_handler add_tag_handler = {
